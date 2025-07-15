@@ -1,0 +1,155 @@
+/* Reseteo básico para eliminar márgenes y paddings predeterminados */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif; /* Fuente principal */
+    background-color: #FFFFFF; /* Fondo blanco */
+    color: #000000; /* Texto principal negro */
+    display: flex;
+    flex-direction: column; /* Organiza el contenido y el footer verticalmente */
+    min-height: 100vh; /* Ocupa toda la altura de la vista */
+    align-items: center; /* Centra horizontalmente */
+    justify-content: space-between; /* Empuja el footer hacia abajo */
+    padding: 20px; /* Un poco de espacio alrededor del contenido */
+    overflow-x: hidden; /* Evita el scroll horizontal */
+}
+
+.contenedor-principal {
+    text-align: center;
+    max-width: 500px; /* Ancho máximo para el contenido principal */
+    width: 100%; /* Asegura que ocupe el ancho disponible */
+    padding: 40px 20px;
+    box-sizing: border-box; /* Incluye padding y border en el ancho/alto */
+    animation: fadeIn 1s ease-out; /* Efecto de aparición suave */
+}
+
+/* Títulos */
+h1 {
+    font-size: 3em; /* Letras grandes para el título */
+    margin-bottom: 20px;
+    font-weight: 700; /* Negrita */
+}
+
+/* Párrafos generales e instrucciones */
+p {
+    font-size: 1.1em;
+    line-height: 1.6; /* Espaciado entre líneas para mejor lectura */
+    margin-bottom: 15px;
+}
+
+/* Estilo para el mensaje de retroalimentación */
+.mensaje {
+    font-weight: 700; /* Mensajes destacados */
+    margin-top: 20px;
+    min-height: 2em; /* Mantiene el espacio incluso si está vacío para evitar saltos */
+    transition: color 0.5s ease; /* Transición de color para los mensajes */
+}
+
+/* Colores para mensajes de éxito y error */
+.mensaje.correcto {
+    color: #008000; /* Verde oscuro para éxito */
+}
+
+.mensaje.incorrecto {
+    color: #FF0000; /* Rojo para error */
+}
+
+/* Área de input y botones */
+.juego-area {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+    justify-content: center;
+    gap: 10px; /* Espacio entre los elementos flex */
+    margin-top: 30px;
+}
+
+/* Estilo del campo de entrada de número */
+#inputSuposicion {
+    padding: 12px 15px;
+    border: 2px solid #000000; /* Borde negro */
+    background-color: #FFFFFF; /* Fondo blanco */
+    color: #000000; /* Texto negro */
+    font-size: 1.1em;
+    text-align: center;
+    width: 150px; /* Ancho fijo */
+    transition: border-color 0.3s ease; /* Transición para el borde al enfocar */
+}
+
+#inputSuposicion:focus {
+    outline: none; /* Elimina el contorno predeterminado al enfocar */
+    border-color: #555555; /* Borde gris oscuro al enfocar */
+}
+
+/* Estilo general para los botones */
+button {
+    padding: 12px 25px;
+    background-color: #000000; /* Fondo negro */
+    color: #FFFFFF; /* Texto blanco */
+    border: 2px solid #000000;
+    font-size: 1.1em;
+    cursor: pointer; /* Cambia el cursor a una mano */
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s ease; /* Efectos de transición */
+}
+
+button:hover {
+    background-color: #333333; /* Fondo gris oscuro al pasar el mouse */
+    transform: translateY(-2px); /* Pequeño efecto de elevación */
+}
+
+button:active {
+    transform: translateY(0); /* Vuelve a la posición normal al hacer clic */
+}
+
+/* Clase para ocultar elementos (usada por JavaScript) */
+.oculto {
+    display: none;
+}
+
+/* Estilo del pie de página */
+footer {
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px; /* Espacio superior */
+    font-size: 0.9em;
+    color: #555555; /* Texto gris suave */
+    width: 100%; /* Ocupa todo el ancho disponible */
+}
+
+/* --- Efectos de Transición y Animaciones --- */
+
+/* Animación de desvanecimiento al cargar el contenedor principal */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Diseño Responsivo --- */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2.2em; /* Título más pequeño en pantallas móviles */
+    }
+
+    p {
+        font-size: 1em;
+    }
+
+    .juego-area {
+        flex-direction: column; /* Apila los elementos verticalmente */
+        align-items: center; /* Centra los elementos apilados */
+    }
+
+    #inputSuposicion, button {
+        width: 80%; /* Ancho más generoso para inputs y botones */
+        max-width: 300px; /* Pero con un límite máximo */
+    }
+}
+
+@media (max-width: 380px) {
+    #inputSuposicion, button {
+        width: 95%; /* Casi todo el ancho en pantallas muy pequeñas */
+    }
+}

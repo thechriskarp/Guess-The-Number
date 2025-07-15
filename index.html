@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adivina el Número</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="contenedor-principal">
+        <h1>Adivina el Número</h1>
+        <p class="instrucciones">Intenta adivinar el número secreto entre 1 y 100.</p>
+        
+        <div class="juego-area">
+            <input type="number" id="inputSuposicion" placeholder="Tu número">
+            <button id="botonComprobar">Comprobar</button>
+            <button id="botonVoz">Di tu número</button> </div>
+
+        <p class="mensaje" id="mensaje"></p>
+        <p class="intentos-restantes" id="intentosRestantes">Intentos restantes: 10</p>
+
+        <button id="botonReiniciar" class="oculto">Jugar de Nuevo</button>
+    </div>
+
+    <footer>
+        <p>Made with ❤️ by Chris</p>
+        <p>&copy; 2024. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
