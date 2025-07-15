@@ -36,6 +36,7 @@ function hablar(texto) {
 // Para Voz a Texto (STT)
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let reconocimiento = null; // Variable para almacenar el objeto de reconocimiento
+let recognitionTimeout; // Variable para el temporizador de reconocimiento
 
 if (SpeechRecognition) {
     reconocimiento = new SpeechRecognition();
@@ -45,6 +46,7 @@ if (SpeechRecognition) {
 
     // Cuando se detecta un resultado de voz
     reconocimiento.onresult = function(event) {
+        clearTimeout(recognitionTimeout); // Limpia el temporizador al obtener un resultado
         const suposicionHablada = event.results[0][0].transcript.trim(); // Obtiene el texto transcrito
         console.log('Suposición hablada:', suposicionHablada);
 
@@ -58,26 +60,40 @@ if (SpeechRecognition) {
             mensaje.textContent = "No pude entender un número. Por favor, dilo de nuevo o escribe tu suposición.";
             hablar("No pude entender un número. Por favor, dilo de nuevo o escribe tu suposición.");
         }
-        botonVoz.textContent = "Di tu número"; // Restaura el texto del botón
+        // Restaura el estado del botón después de procesar el resultado
+        botonVoz.textContent = "Di tu número";
+        botonVoz.disabled = false;
     };
 
     // Manejo de errores en el reconocimiento de voz
     reconocimiento.onerror = function(event) {
+        clearTimeout(recognitionTimeout); // Limpia el temporizador si hay un error
         console.error('Error en el reconocimiento de voz:', event.error);
         mensaje.textContent = 'Error de voz: ' + event.error + '. Intenta de nuevo o escribe.';
         hablar('Lo siento, hubo un error con la entrada de voz. Por favor, intenta de nuevo o escribe tu número.');
-        botonVoz.textContent = "Di tu número"; // Restaura el texto del botón
+        // Restaura el estado del botón después de un error
+        botonVoz.textContent = "Di tu número";
+        botonVoz.disabled = false;
     };
 
-    // Cuando el reconocimiento de voz termina
+    // Cuando el reconocimiento de voz termina (por stop() o por silencio prolongado)
     reconocimiento.onend = function() {
+        // Este evento se dispara incluso si onresult/onerror ya se dispararon.
+        // Solo asegúrate de que el botón se restaure si no fue ya restaurado por onresult/onerror.
+        if (botonVoz.disabled) { // Si el botón sigue deshabilitado, significa que no hubo onresult/onerror
+            botonVoz.textContent = "Di tu número";
+            botonVoz.disabled = false;
+            // Si el temporizador no se limpió por onresult/onerror, límpialo aquí también
+            clearTimeout(recognitionTimeout); 
+        }
         console.log('Reconocimiento de voz finalizado.');
-        botonVoz.textContent = "Di tu número"; // Asegura que el botón se restaure
     };
 
 } else {
     // Si el navegador no soporta Speech Recognition, oculta el botón de voz
-    botonVoz.style.display = 'none';
+    if (botonVoz) { // Asegúrate de que el botón exista antes de intentar manipularlo
+        botonVoz.style.display = 'none';
+    }
     console.warn('Tu navegador no soporta el reconocimiento de voz. El botón de voz está deshabilitado.');
 }
 
@@ -130,13 +146,16 @@ function verificarAdivinanza() {
 function finalizarJuego(gano) {
     inputSuposicion.disabled = true; // Deshabilita el input
     botonComprobar.disabled = true; // Deshabilita el botón de comprobar
-    botonVoz.disabled = true; // Deshabilita el botón de voz
+    if (botonVoz) { // Solo deshabilita si el botón de voz existe
+        botonVoz.disabled = true; // Deshabilita el botón de voz
+    }
     botonReiniciar.classList.remove('oculto'); // Muestra el botón de reiniciar
     
-    // Si el reconocimiento de voz estaba activo, deténlo
+    // Si el reconocimiento de voz estaba activo, deténlo y limpia el temporizador
     if (reconocimiento && reconocimiento.recognizing) {
         reconocimiento.stop();
     }
+    clearTimeout(recognitionTimeout); // Asegúrate de limpiar el temporizador
 }
 
 // Función para reiniciar el juego
@@ -153,7 +172,7 @@ function reiniciarJuego() {
     inputSuposicion.disabled = false;
     botonComprobar.disabled = false;
     if (SpeechRecognition) { // Solo si el reconocimiento de voz está soportado
-        botonVoz.disabled = false;
+        if (botonVoz) botonVoz.disabled = false;
     }
     botonReiniciar.classList.add('oculto');
     inputSuposicion.focus();
@@ -176,15 +195,32 @@ inputSuposicion.addEventListener('keypress', function(event) {
 if (botonVoz && SpeechRecognition) { // Asegúrate de que el botón y la API existan
     botonVoz.addEventListener('click', function() {
         if (reconocimiento) {
+            // Asegúrate de que no haya una sesión de reconocimiento activa
+            if (reconocimiento.recognizing) {
+                reconocimiento.stop();
+            }
+
             mensaje.textContent = 'Escuchando... Di tu número.';
             hablar('Escuchando. Di tu número.');
             reconocimiento.start(); // Inicia el reconocimiento de voz
             botonVoz.textContent = "Escuchando..."; // Cambia el texto del botón
+            botonVoz.disabled = true; // Deshabilita el botón mientras escucha
+
+            // Configura un temporizador para detener el reconocimiento si no hay input después de 5 segundos
+            recognitionTimeout = setTimeout(() => {
+                if (reconocimiento && reconocimiento.recognizing) {
+                    reconocimiento.stop(); // Detiene el reconocimiento si el temporizador expira
+                    mensaje.textContent = 'No detecté tu voz. Por favor, intenta de nuevo o escribe tu número.';
+                    hablar('No detecté tu voz. Por favor, intenta de nuevo o escribe tu número.');
+                    botonVoz.textContent = "Di tu número";
+                    botonVoz.disabled = false;
+                }
+            }, 5000); // 5 segundos
         }
     });
 }
 
-// Mensaje de inicio de juego con voz
+// Mensaje de inicio de juego con voz al cargar la página
 window.addEventListener('load', () => {
     hablar(`Hola. He pensado un número entre ${minNumero} y ${maxNumero}. Tienes ${intentosMaximos} intentos para adivinarlo.`);
     inputSuposicion.focus();
